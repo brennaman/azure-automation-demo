@@ -5,12 +5,24 @@ param(
 )
 
 $subId = Get-AutomationVariable -Name 'AzureSubscriptionId'
-$conn = Get-AutomationConnection -Name 'AzureRunAsConnection'
 
 #connect to azure
+$conn = Get-AutomationConnection -Name 'AzureRunAsConnection'
 
+Add-AzureRmAccount `
+    -ServicePrincipal `
+    -TenantId $conn.TenantId `
+    -ApplicationId $conn.ApplicationId `
+    -CertificateThumbprint $conn.CertificateThumbprint
+
+Set-AzureRmContext -SubscriptionId $subId
 
 # retreive all VMs that match the rg name
+$vms = Get-AzureRmVM | where {$_.ResourceGroupName -like $rgName}
+
+foreach($vm in $vms){
+    Write-Output $vm.Name
+}
 
 
 #turn off machines
