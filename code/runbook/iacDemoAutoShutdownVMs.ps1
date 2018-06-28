@@ -21,7 +21,15 @@ Set-AzureRmContext -SubscriptionId $subId
 $vms = Get-AzureRmVM | where {$_.ResourceGroupName -like $rgName}
 
 foreach($vm in $vms){
-    Write-Output $vm.Name
+    $status = $vm | Stop-AzureRmVM -Force -ErrorAction "Continue"
+
+    if($status.Status -ne "Succeeded"){
+        Write-Output ($vm.Name + " failed to stop")
+    }
+    else{
+        Write-Output ($vm.Name + " successfully stopped")
+    }
+    
 }
 
 
